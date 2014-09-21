@@ -5,35 +5,50 @@ function preload() {
     game.load.image('background','assets/background.png');
     game.load.image('player','assets/hero.png');
     game.load.image('enemy','assets/enemy.png');
+    game.load.audio('piu', 'assets/piu.ogg');
 }
 
 var player;
 var cursors;
 var spacebarKey;
 var enemies;
+var piu;
 
 function create() {
+
+    piu = game.add.audio("piu");
 
     game.add.tileSprite(0, 0, 4992, 3072, 'background');
 
     game.world.setBounds(0, 0, 4992, 3072);
 
     game.physics.startSystem(Phaser.Physics.P2JS);
+    game.physics.p2.setImpactEvents(true);
 
     player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
 
     game.physics.p2.enable(player);
 
     enemies = game.add.group();
+    var enemyCollisionGroup = game.physics.p2.createCollisionGroup();
+    var playerCollisionGroup = game.physics.p2.createCollisionGroup();
+
+    game.physics.p2.updateBoundsCollisionGroup();
+
     for (var i = 0; i < 100; i++) {
         var enemy = enemies.create(game.rnd.integerInRange(0, 4992), game.rnd.integerInRange(0, 3072), 'enemy');
         game.physics.p2.enable(enemy,false);
+        enemy.body.setCollisionGroup(enemyCollisionGroup);
+        enemy.body.collides([enemyCollisionGroup, playerCollisionGroup]);
     }
+
     cursors = game.input.keyboard.createCursorKeys();
     spacebarKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     game.camera.follow(player);
 
+    player.body.setCollisionGroup(playerCollisionGroup);
 
+    player.body.collides(enemyCollisionGroup, onCollide);
 }
 var forceAway = 0;
 
@@ -85,4 +100,8 @@ function render() {
     /*game.debug.cameraInfo(game.camera, 32, 32);
     game.debug.spriteCoords(player, 32, 500);*/
 
+}
+
+function onCollide(){
+    piu.play();
 }
