@@ -32,6 +32,8 @@ function create() {
     cursors = game.input.keyboard.createCursorKeys();
     spacebarKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     game.camera.follow(player);
+
+
 }
 var forceAway = 0;
 
@@ -58,12 +60,15 @@ function update(){
     }
     
     if((spacebarKey.isDown)&&(forceAway ===0)){
-          forceAway = 600;
+          forceAway = 1000;
     }
     forceAway = Math.max(0,forceAway-1);
     enemies.forEachAlive(
         function(enemy){
-            accelerateToObject(enemy, player, Math.min((-forceAway + 500),0));
+            var resultForce = -forceAway +500;
+            if(resultForce >0)
+                resultForce = 50;
+            accelerateToObject(enemy, player, resultForce);
     });
 }
 
